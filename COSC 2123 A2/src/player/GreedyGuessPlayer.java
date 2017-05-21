@@ -1,5 +1,6 @@
 package player;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -54,7 +55,6 @@ public class GreedyGuessPlayer implements Player {
 			}
 			i++;
 		}
-		
 
 	} // end of initialisePlayer()
 
@@ -85,16 +85,16 @@ public class GreedyGuessPlayer implements Player {
 		return answer;
 	} // end of getAnswer()
 
-	public void generateNextGuess() {
-		colGuess += 2;
-		if (colGuess == 10) {
-			colGuess = 1;
-			rowGuess++;
-		} else if (colGuess == 11) {
-			colGuess = 0;
-			rowGuess++;
-		}
-	}
+	// public void generateNextGuess() {
+	// colGuess += 2;
+	// if (colGuess == 10) {
+	// colGuess = 1;
+	// rowGuess++;
+	// } else if (colGuess == 11) {
+	// colGuess = 0;
+	// rowGuess++;
+	// }
+	// }
 
 	public void huntInit(int pos) {
 
@@ -175,31 +175,105 @@ public class GreedyGuessPlayer implements Player {
 
 	}
 
+	public ArrayList<Integer> parityGen(int config, int line) {
+		ArrayList<Integer> lineElem = new ArrayList<>();
+		if (config == 0) {
+			line--;
+			while (line > -1) {
+				lineElem.add(line);
+				line -= 2;
+			}
+		}
+
+		if (config == 1) {
+			line-=2;
+			while (line > -1) {
+				lineElem.add(line);
+				line -= 2;
+			}
+		}
+		return lineElem;
+	}
+
 	@Override
 	public Guess makeGuess() {
-		Guess guess = new Guess();
-		
+		Random rando = new Random();
+		int rowIndex;
+		int colIndex;
+		int i = 0;
+		int j = 0;
+		int config;
+
+		ArrayList<Integer> rowConfig0 = parityGen(0, this.rowSize);
+		ArrayList<Integer> rowConfig1 = parityGen(1, this.rowSize);
+
+		ArrayList<Integer> colConfig0 = parityGen(0, this.colSize);
+		ArrayList<Integer> colConfig1 = parityGen(1, this.colSize);
+
 		do {
-		if (isHunt && this.isGuessed[guess.row][guess.column]) {
-		 huntInit(pos);
-		 //huntProgress(pos);
-		 guess.row = rowHunt;
-		 guess.column = colHunt;
-		 if (pos < 4) {
-		 pos++;
-		 }
-		 } else {
-		 guess.row = rowGuess;
-		 guess.column = colGuess;
-		 generateNextGuess();
-		 }
-		 }while (this.isGuessed[guess.row][guess.column]);
-		
-		this.isGuessed[guess.row][guess.column] = true;
-			
-		 // dummy return
-		 return guess;
+			config = rando.nextInt(2);
+
+			if (config == 0) {
+				rowIndex = rando.nextInt(rowConfig0.size());
+				colIndex = rando.nextInt(colConfig1.size());
+				i = rowConfig0.get(rowIndex);
+				j = colConfig1.get(colIndex);
+			} else if (config == 1) {
+				rowIndex = rando.nextInt(rowConfig1.size());
+				colIndex = rando.nextInt(colConfig0.size());
+				i = rowConfig1.get(rowIndex);
+				j = colConfig0.get(colIndex);
+			}
+
+		} while (this.isGuessed[i][j] != false);
+
+		Guess randoGuess = new Guess();
+
+		randoGuess.row = i;
+		randoGuess.column = j;
+
+		this.isGuessed[i][j] = true;
+
+		return randoGuess;
 	} // end of makeGuess()
+
+	// Guess guess = new Guess();
+	//
+	// do {
+	// if (isHunt && this.isGuessed[guess.row][guess.column]) {
+	// huntInit(pos);
+	// //huntProgress(pos);
+	// guess.row = rowHunt;
+	// guess.column = colHunt;
+	// if (pos < 4) {
+	// pos++;
+	// }
+	//
+	// if (pos == 4) {
+	//
+	// }
+	// } else {
+	// guess.row = rowGuess;
+	// guess.column = colGuess;
+	// generateNextGuess();
+	// }
+	//
+	// if (guess.row < 0 || guess.column < 0 || guess.row > 9 || guess.column >
+	// 9) {
+	// guess.row = rowGuess;
+	// guess.column = colGuess;
+	// generateNextGuess();
+	// }
+	// }while (this.isGuessed[guess.row][guess.column]);
+	//
+	// this.isGuessed[guess.row][guess.column] = true;
+	//
+	// if (guess.row < 0 || guess.column < 0 || guess.row > 9 || guess.column >
+	// 9) {
+	//
+	// }
+	// // dummy return
+	// return guess;
 
 	@Override
 	public void update(Guess guess, Answer answer) {
