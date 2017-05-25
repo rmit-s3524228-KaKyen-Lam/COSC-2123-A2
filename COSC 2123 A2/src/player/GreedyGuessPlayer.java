@@ -33,17 +33,18 @@ public class GreedyGuessPlayer implements Player {
 	boolean[][] isGuessed;
 	OwnShip[] ownShips = new OwnShip[5];
 
-	
-	private int rowTarget = 0; 
+	private int rowTarget = 0;
 	private int colTarget = 0;
 
-	private int rowFirstHit = 0; 
+	private int rowFirstHit = 0;
 	private int colFirstHit = 0;
 
 	private boolean isFound = false;
-	private int huntPos = 0; //Hunting direction (0:up, 1:right, 2:down, 3:left)
+	private int huntPos = 0; // Hunting direction (0:up, 1:right, 2:down,
+								// 3:left)
 
-	private boolean isHunt = false; //Boolean to check if the four sides of the initial hit has been checked
+	private boolean isHunt = false; // Boolean to check if the four sides of the
+									// initial hit has been checked
 	private boolean isBacktrack = false;
 	private boolean isFirstHit = true;
 
@@ -253,15 +254,18 @@ public class GreedyGuessPlayer implements Player {
 			randoGuess.column = j;
 			rowTarget = i;
 			colTarget = j;
+			this.isGuessed[i][j] = true;
 
 			// if (resetLoop) /* Used for testing */ {
+			// randoGuess.row = i;
+			// randoGuess.column = j;
+			// rowTarget = i;
+			// colTarget = j;
 			// } else {
 			// // Test variables
-			// randoGuess.row = 9;
-			// randoGuess.column = 1;
+			// randoGuess.row = 3;
+			// randoGuess.column = 4;
 			// }
-
-			this.isGuessed[i][j] = true;
 
 			return randoGuess;
 		} else {
@@ -279,10 +283,9 @@ public class GreedyGuessPlayer implements Player {
 	@Override
 	public void update(Guess guess, Answer answer) {
 
- 
 		if (!this.isFound && answer.isHit) {
-			//If ship has not been found earlier and is just being hit
-			
+			// If ship has not been found earlier and is just being hit
+
 			this.isFound = true;
 			this.isHunt = true;
 			huntPos = 0;
@@ -293,56 +296,38 @@ public class GreedyGuessPlayer implements Player {
 			isFirstHit = true;
 		}
 
-
 		if (this.isFound) {
-			//If ship has been found
-			
+			// If ship has been found
+
 			if (answer.isHit && !isFirstHit) {
-				//If ship has been hit and is not the first hit
-				
+				// If ship has been hit and is not the first hit
+
 				isHunt = false;
-				
-				if (!isBacktrack) {
-					//If targeting has not reversed direction
-					
-					if (huntPos == 0) {
-						rowTarget++;
-					} else if (huntPos == 1) {
-						colTarget++;
-					} else if (huntPos == 2) {
-						rowTarget--;
-					} else if (huntPos == 3) {
-						colTarget--;
-					}
-					boundaryCheck(1);
-					
-				} else {
-					//If targeting has reversed direction
-					
-					if (huntPos == 0) {
-						rowTarget--;
-					} else if (huntPos == 1) {
-						colTarget--;
-					} else if (huntPos == 2) {
-						rowTarget++;
-					} else if (huntPos == 3) {
-						colTarget++;
-					}
-					
+
+				if (huntPos == 0) {
+					rowTarget++;
+				} else if (huntPos == 1) {
+					colTarget++;
+				} else if (huntPos == 2) {
+					rowTarget--;
+				} else if (huntPos == 3) {
+					colTarget--;
 				}
+				boundaryCheck(1);
+
 			}
 
 			if (!answer.isHit) {
-				//If ship is not hit
-				
+				// If ship is not hit
+
 				if (isHunt) {
-					//If in initial hunting mode
-					
+					// If in initial hunting mode
+
 					huntPos++;
-					
+
 				} else {
-					//If not in initial hunting mode
-					
+					// If in targeting mode
+
 					if (huntPos == 0) {
 						downInitial();
 					} else if (huntPos == 1) {
@@ -352,13 +337,13 @@ public class GreedyGuessPlayer implements Player {
 					} else if (huntPos == 3) {
 						rightInitial();
 					}
-					isBacktrack = true;
+					isBacktrack = true; // Reverse direction of shot
 				}
 			}
 
 			if (isHunt) {
-				//If in initial hunting mode
-				
+				// If in initial hunting mode
+
 				if (huntPos == 0) {
 					upInitial();
 				} else if (huntPos == 1) {
@@ -370,16 +355,17 @@ public class GreedyGuessPlayer implements Player {
 				}
 				boundaryCheck(0);
 				isFirstHit = false;
-				
+
 			}
 		}
 
 		if (answer.shipSunk != null) {
 			this.isFound = false;
 			isBacktrack = false;
-			// resetLoop = true; for testing
+			// resetLoop = true; //for testing
 
 		}
+
 	} // end of update()
 
 	@Override
