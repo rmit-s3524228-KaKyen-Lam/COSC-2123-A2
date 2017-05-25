@@ -45,7 +45,6 @@ public class GreedyGuessPlayer implements Player {
 
 	private boolean isHunt = false; // Boolean to check if the four sides of the
 									// initial hit has been checked
-	private boolean isBacktrack = false;
 	private boolean isFirstHit = true;
 
 	/* For testing */
@@ -162,20 +161,16 @@ public class GreedyGuessPlayer implements Player {
 
 			if (rowTarget >= rowSize) {
 				downInitial();
-				isBacktrack = true;
 			}
 
 			if (colTarget >= colSize) {
 				leftInitial();
-				isBacktrack = true;
 			}
 			if (rowTarget < 0) {
 				upInitial();
-				isBacktrack = true;
 			}
 			if (colTarget < 0) {
 				rightInitial();
-				isBacktrack = true;
 			}
 		}
 
@@ -326,7 +321,7 @@ public class GreedyGuessPlayer implements Player {
 					huntPos++;
 
 				} else {
-					// If in targeting mode
+					// If in targeting mode and direction has to be reversed
 
 					if (huntPos == 0) {
 						downInitial();
@@ -337,7 +332,6 @@ public class GreedyGuessPlayer implements Player {
 					} else if (huntPos == 3) {
 						rightInitial();
 					}
-					isBacktrack = true; // Reverse direction of shot
 				}
 			}
 
@@ -361,7 +355,6 @@ public class GreedyGuessPlayer implements Player {
 
 		if (answer.shipSunk != null) {
 			this.isFound = false;
-			isBacktrack = false;
 			// resetLoop = true; //for testing
 
 		}
