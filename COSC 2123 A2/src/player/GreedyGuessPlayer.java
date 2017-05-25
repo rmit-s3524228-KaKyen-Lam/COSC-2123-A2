@@ -33,36 +33,22 @@ public class GreedyGuessPlayer implements Player {
 	boolean[][] isGuessed;
 	OwnShip[] ownShips = new OwnShip[5];
 
-	private int rowGuess = 0;
-	private int colGuess = 0;
+	
+	private int rowTarget = 0; 
+	private int colTarget = 0;
 
-	private int huntCount = 0;
-	private int rowInitHunt = 0;
-	private int colInitHunt = 0;
-	private int rowProgHunt = 0;
-	private int colProgHunt = 0;
+	private int rowFirstHit = 0; 
+	private int colFirstHit = 0;
 
-	private int huntTargetCol;
-	private int huntTargetRow;
+	private boolean isFound = false;
+	private int huntPos = 0; //Hunting direction (0:up, 1:right, 2:down, 3:left)
 
-	private boolean isHunt = false;
-	private int backDist = 2;
-	private int huntPos = 0;
-
-	int pos = 0;
-	private boolean isInitialHunt = false;
+	private boolean isHunt = false; //Boolean to check if the four sides of the initial hit has been checked
 	private boolean isBacktrack = false;
+	private boolean isFirstHit = true;
 
-	public ArrayList<Coordinate> playerShots = new ArrayList<>();
-	private int hitPos;
-	private boolean isFirstGuess = true;
-	private boolean resetLoop = false;
-
-	// private ArrayList[][] checkShots = new ArrayList[int][int];
-
-	// private static ArrayList<ArrayList<Integer>> checkShots = new
-	// ArrayList<ArrayList<Integer>>();
-	// private World.Coordinate test = new World.Coordinate();
+	/* For testing */
+	// private boolean resetLoop = false;
 
 	@Override
 	public void initialisePlayer(World world) {
@@ -111,119 +97,82 @@ public class GreedyGuessPlayer implements Player {
 		return answer;
 	} // end of getAnswer()
 
-	public void huntInit(int pos) { // Checks that hunting shot is not out of
-									// bounds
-
-		if ((huntTargetRow - rowSize) < 0) {
-			pos = 2;
-		} else if (huntTargetCol > colSize) {
-			pos = 3;
-		} else if (huntTargetRow > rowSize) {
-			pos = 4;
-		} else if ((huntTargetCol - colSize) < 0) {
-			pos = 0;
-
-		}
-	}
-
+	/**
+	 * Create reference to grid above the initial hit target
+	 */
 	public void upInitial() {
-		rowGuess = rowInitHunt + 1;
-		colGuess = colInitHunt;
-		pos = 0;
+		rowTarget = rowFirstHit + 1;
+		colTarget = colFirstHit;
+		huntPos = 0;
 	}
 
+	/**
+	 * Create reference to grid right of the initial hit target
+	 */
 	public void rightInitial() {
-		rowGuess = rowInitHunt;
-		colGuess = colInitHunt + 1;
-		pos = 1;
+		rowTarget = rowFirstHit;
+		colTarget = colFirstHit + 1;
+		huntPos = 1;
 	}
 
+	/**
+	 * Create reference to grid below the initial hit target
+	 */
 	public void downInitial() {
-		rowGuess = rowInitHunt - 1;
-		colGuess = colInitHunt;
-		pos = 2;
+		rowTarget = rowFirstHit - 1;
+		colTarget = colFirstHit;
+		huntPos = 2;
 	}
 
+	/**
+	 * Create reference to grid left of the initial hit target
+	 */
 	public void leftInitial() {
-		rowGuess = rowInitHunt;
-		colGuess = colInitHunt - 1;
-		pos = 3;
+		rowTarget = rowFirstHit;
+		colTarget = colFirstHit - 1;
+		huntPos = 3;
 	}
 
-	public void guessCheck(int mode) {
-		boolean guessed = this.isGuessed[rowGuess][colGuess];
-		if (guessed) {
-			if (mode == 0) {
-				if (pos == 0) {
-					rightInitial();
-					pos = 1;
-				}
-
-				if (pos == 1) {
-					downInitial();
-					pos = 2;
-				}
-				if (pos == 2) {
-					leftInitial();
-					pos = 3;
-				}
-				if (pos == 3) {
-					upInitial();
-					pos = 0;
-				}
-			} else {
-				isBacktrack = true;
-				if (pos == 0) {
-					downInitial();
-				}
-
-				if (pos == 1) {
-					leftInitial();
-				}
-				if (pos == 2) {
-					upInitial();
-					pos = 0;
-				}
-				if (pos == 3) {
-					rightInitial();
-					pos = 1;
-				}
-			}
-		}
-	}
-
+	/**
+	 * Check if guess exceeds boundary of the board
+	 * 
+	 * @param mode
+	 *            Configuration for boundary check (0 for hunt mode, 1 for
+	 *            target mode)
+	 * 
+	 */
 	public void boundaryCheck(int mode) {
 
 		if (mode == 0) {
-			if (rowGuess >= rowSize) {
+			if (rowTarget >= rowSize) {
 				rightInitial();
 			}
 
-			if (colGuess >= colSize) {
+			if (colTarget >= colSize) {
 				downInitial();
 			}
-			if (rowGuess < 0) {
+			if (rowTarget < 0) {
 				leftInitial();
 			}
-			if (colGuess < 0) {
+			if (colTarget < 0) {
 				upInitial();
 			}
 		} else {
-			
-			if (rowGuess >= rowSize) {
+
+			if (rowTarget >= rowSize) {
 				downInitial();
 				isBacktrack = true;
 			}
 
-			if (colGuess >= colSize) {
+			if (colTarget >= colSize) {
 				leftInitial();
 				isBacktrack = true;
 			}
-			if (rowGuess < 0) {
+			if (rowTarget < 0) {
 				upInitial();
 				isBacktrack = true;
 			}
-			if (colGuess < 0) {
+			if (colTarget < 0) {
 				rightInitial();
 				isBacktrack = true;
 			}
@@ -231,75 +180,32 @@ public class GreedyGuessPlayer implements Player {
 
 	}
 
-	//
-	// } else if (pos == 1) {
-	//
-	// } else if (pos == 2) {
-	//
-	// } else if (pos == 3) {
-	//
-	// }
-
-	// public boolean boundaryCheck() {
-	// boolean isOut = true;
-	// if (rowGuess >= rowSize) {
-	// rowGuess = rowInitHunt;
-	// pos = 1;
-	// } else if (colGuess >= colSize) {
-	// colGuess = colInitHunt;
-	// pos = 2;
-	// } else if (rowGuess < 0) {
-	// rowGuess = rowInitHunt;
-	// pos = 3;
-	// } else if (colGuess < 0) {
-	// colGuess = colInitHunt;
-	// pos = 0;
-	// } else {
-	// isOut = false;
-	// }
-	// return isOut;
-	// }
-
-	// public void initialHunt() {
-	// int i = 0;
-	// int j = 0;
-	//
-	// do {
-	// if (pos == 0) {
-	// rowInitHunt = rowGuess;
-	// colInitHunt = colGuess + 1;
-	// } else if (pos == 1) {
-	// rowInitHunt = rowGuess + 1;
-	// colInitHunt = colGuess;
-	// } else if (pos == 2) {
-	// rowInitHunt = rowGuess;
-	// colInitHunt = colGuess - 1;
-	// } else if (pos == 3) {
-	// rowInitHunt = rowGuess - 1;
-	// colInitHunt = colGuess;
-	// }
-	//
-	// } while (this.isGuessed[i][j] != false);
-	// pos++;
-	//
-	// }
-
-	public ArrayList<Integer> parityGen(int config, int line) {
+	/**
+	 * Generate parity selection of board by creating lines of alternating
+	 * pattern based on line size
+	 * 
+	 * @param config
+	 *            Configuration for alternate line selection (0,1)
+	 * @param lineSize
+	 *            Size of line
+	 * @return
+	 */
+	public ArrayList<Integer> parityGen(int config, int lineSize) {
 		ArrayList<Integer> lineElem = new ArrayList<>();
 
 		if (config == 0) {
-			line--;
-			while (line > -1) {
-				lineElem.add(line);
-				line -= 2;
+			lineSize--;
+			while (lineSize > -1) {
+				lineElem.add(lineSize);
+				lineSize -= 2;
 			}
 		}
 
 		if (config == 1) {
-			line -= 2;
-			while (line > -1) {
-				lineElem.add(line);
-				line -= 2;
+			lineSize -= 2;
+			while (lineSize > -1) {
+				lineElem.add(lineSize);
+				lineSize -= 2;
 			}
 		}
 		return lineElem;
@@ -316,7 +222,8 @@ public class GreedyGuessPlayer implements Player {
 		int config;
 		Guess randoGuess = new Guess();
 
-		if (this.isHunt != true) {
+		if (this.isFound != true) {
+			// if ship has not been found
 
 			ArrayList<Integer> rowConfig0 = parityGen(0, this.rowSize);
 			ArrayList<Integer> rowConfig1 = parityGen(1, this.rowSize);
@@ -342,25 +249,26 @@ public class GreedyGuessPlayer implements Player {
 
 			} while (this.isGuessed[i][j] != false);
 
-			if (resetLoop) /* Used for testing */ {
+			randoGuess.row = i;
+			randoGuess.column = j;
+			rowTarget = i;
+			colTarget = j;
 
-				randoGuess.row = i;
-				randoGuess.column = j;
-				rowGuess = i;
-				colGuess = j;
-			} else {
-				// Test variables
-				randoGuess.row = 9;
-				randoGuess.column = 1;
-			}
+			// if (resetLoop) /* Used for testing */ {
+			// } else {
+			// // Test variables
+			// randoGuess.row = 9;
+			// randoGuess.column = 1;
+			// }
 
 			this.isGuessed[i][j] = true;
 
 			return randoGuess;
 		} else {
+			// if ship has been found
 
-			randoGuess.row = rowGuess;
-			randoGuess.column = colGuess;
+			randoGuess.row = rowTarget;
+			randoGuess.column = colTarget;
 
 			this.isGuessed[randoGuess.row][randoGuess.column] = true;
 			return randoGuess;
@@ -371,83 +279,106 @@ public class GreedyGuessPlayer implements Player {
 	@Override
 	public void update(Guess guess, Answer answer) {
 
-		if (!this.isHunt && answer.isHit) {
+ 
+		if (!this.isFound && answer.isHit) {
+			//If ship has not been found earlier and is just being hit
+			
+			this.isFound = true;
 			this.isHunt = true;
-			this.isInitialHunt = true;
-			huntPos = 0; // Resets hunt stats to start hunting from last
-							// hit
-			colInitHunt = guess.column;
-			rowInitHunt = guess.row;
-			colGuess = colInitHunt;
-			rowGuess = rowInitHunt;
-			isFirstGuess = true;
+			huntPos = 0;
+			colFirstHit = guess.column;
+			rowFirstHit = guess.row;
+			colTarget = colFirstHit;
+			rowTarget = rowFirstHit;
+			isFirstHit = true;
 		}
 
-		if (this.isHunt) {
-			if (answer.isHit && !isFirstGuess) {
-				hitPos = pos;
-				isInitialHunt = false;
+
+		if (this.isFound) {
+			//If ship has been found
+			
+			if (answer.isHit && !isFirstHit) {
+				//If ship has been hit and is not the first hit
+				
+				isHunt = false;
+				
 				if (!isBacktrack) {
-					if (pos == 0) {
-						rowGuess++;
-					} else if (pos == 1) {
-						colGuess++;
-					} else if (pos == 2) {
-						rowGuess--;
-					} else if (pos == 3) {
-						colGuess--;
+					//If targeting has not reversed direction
+					
+					if (huntPos == 0) {
+						rowTarget++;
+					} else if (huntPos == 1) {
+						colTarget++;
+					} else if (huntPos == 2) {
+						rowTarget--;
+					} else if (huntPos == 3) {
+						colTarget--;
 					}
 					boundaryCheck(1);
+					
 				} else {
-					if (pos == 0) {
-						rowGuess--;
-					} else if (pos == 1) {
-						colGuess--;
-					} else if (pos == 2) {
-						rowGuess++;
-					} else if (pos == 3) {
-						colGuess++;
+					//If targeting has reversed direction
+					
+					if (huntPos == 0) {
+						rowTarget--;
+					} else if (huntPos == 1) {
+						colTarget--;
+					} else if (huntPos == 2) {
+						rowTarget++;
+					} else if (huntPos == 3) {
+						colTarget++;
 					}
+					
 				}
 			}
 
 			if (!answer.isHit) {
-				if (isInitialHunt) {
-					pos++;
+				//If ship is not hit
+				
+				if (isHunt) {
+					//If in initial hunting mode
+					
+					huntPos++;
+					
 				} else {
-					if (pos == 0) {
+					//If not in initial hunting mode
+					
+					if (huntPos == 0) {
 						downInitial();
-					} else if (pos == 1) {
+					} else if (huntPos == 1) {
 						leftInitial();
-					} else if (pos == 2) {
+					} else if (huntPos == 2) {
 						upInitial();
-					} else if (pos == 3) {
+					} else if (huntPos == 3) {
 						rightInitial();
 					}
 					isBacktrack = true;
 				}
 			}
 
-			if (isInitialHunt) {
-				if (pos == 0) {
+			if (isHunt) {
+				//If in initial hunting mode
+				
+				if (huntPos == 0) {
 					upInitial();
-				} else if (pos == 1) {
+				} else if (huntPos == 1) {
 					rightInitial();
-				} else if (pos == 2) {
+				} else if (huntPos == 2) {
 					downInitial();
-				} else if (pos == 3) {
+				} else if (huntPos == 3) {
 					leftInitial();
 				}
 				boundaryCheck(0);
-				isFirstGuess = false;
+				isFirstHit = false;
+				
 			}
 		}
 
 		if (answer.shipSunk != null) {
-			this.isHunt = false;
+			this.isFound = false;
 			isBacktrack = false;
-			resetLoop = true;
-			pos = 0;
+			// resetLoop = true; for testing
+
 		}
 	} // end of update()
 
