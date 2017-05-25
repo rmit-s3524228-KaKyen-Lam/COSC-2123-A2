@@ -29,33 +29,40 @@ public class GreedyGuessPlayer implements Player {
 
 	private int rowSize = 0;
 	private int colSize = 0;
-	
+
 	boolean[][] isGuessed;
 	OwnShip[] ownShips = new OwnShip[5];
 
 	private int rowGuess = 0;
 	private int colGuess = 0;
-	
+
 	private int huntCount = 0;
-	private int rowHunt = 0;
-	private int colHunt = 0;
+	private int rowInitHunt = 0;
+	private int colInitHunt = 0;
+	private int rowProgHunt = 0;
+	private int colProgHunt = 0;
+
 	private int huntTargetCol;
 	private int huntTargetRow;
-	
+
 	private boolean isHunt = false;
 	private int backDist = 2;
 	private int huntPos = 0;
-	
-	 public ArrayList<Coordinate> playerShots = new ArrayList<>();
-	 
-	
-//	private ArrayList[][] checkShots = new ArrayList[int][int];
-	
-//	private static ArrayList<ArrayList<Integer>> checkShots = new ArrayList<ArrayList<Integer>>();
-//	private World.Coordinate test = new World.Coordinate();
-	
-	
-	
+
+	int pos = 0;
+	private boolean isInitialHunt = false;
+	private boolean isBacktrack = false;
+
+	public ArrayList<Coordinate> playerShots = new ArrayList<>();
+	private int hitPos;
+	private boolean isFirstGuess = true;
+	private boolean resetLoop = false;
+
+	// private ArrayList[][] checkShots = new ArrayList[int][int];
+
+	// private static ArrayList<ArrayList<Integer>> checkShots = new
+	// ArrayList<ArrayList<Integer>>();
+	// private World.Coordinate test = new World.Coordinate();
 
 	@Override
 	public void initialisePlayer(World world) {
@@ -83,7 +90,7 @@ public class GreedyGuessPlayer implements Player {
 			for (int j = 0; j < this.ownShips[i].ship.len(); j++) {
 				if ((guess.row == this.ownShips[i].rowCoord[j]) && guess.column == this.ownShips[i].colCoord[j]) {
 					answer.isHit = true;
-										
+
 					this.ownShips[i].isdown[j] = true;
 					boolean isSunk = true;
 					for (int k = 0; k < this.ownShips[i].ship.len(); k++) {
@@ -104,121 +111,182 @@ public class GreedyGuessPlayer implements Player {
 		return answer;
 	} // end of getAnswer()
 
-	 public void generateNextGuess() {
-		 colGuess += 2;
-		 	if (colGuess == 10) {
-		 		colGuess = 1;
-		 		rowGuess++;
-		 } else if (colGuess == 11) {
-			 colGuess = 0;
-			 rowGuess++;
-		 }
-	 }
+	public void huntInit(int pos) { // Checks that hunting shot is not out of
+									// bounds
 
-	public void huntInit(int pos) { //Checks that hunting shot is not out of bounds
-
-		// Initial
-//		 colGuess + 1;
-//		 colGuess - 1;
-//		 rowGuess + 1;
-//		 rowGuess - 1;
-
-		if((huntTargetRow - rowSize) < 0) {
-			pos =2; 
+		if ((huntTargetRow - rowSize) < 0) {
+			pos = 2;
 		} else if (huntTargetCol > colSize) {
-			pos =3;
-		} else if (huntTargetRow >rowSize) {
-			pos =4;			
-		} else if((huntTargetCol - colSize) < 0) {
-			pos =0;
+			pos = 3;
+		} else if (huntTargetRow > rowSize) {
+			pos = 4;
+		} else if ((huntTargetCol - colSize) < 0) {
+			pos = 0;
+
+		}
+	}
+
+	public void upInitial() {
+		rowGuess = rowInitHunt + 1;
+		colGuess = colInitHunt;
+		pos = 0;
+	}
+
+	public void rightInitial() {
+		rowGuess = rowInitHunt;
+		colGuess = colInitHunt + 1;
+		pos = 1;
+	}
+
+	public void downInitial() {
+		rowGuess = rowInitHunt - 1;
+		colGuess = colInitHunt;
+		pos = 2;
+	}
+
+	public void leftInitial() {
+		rowGuess = rowInitHunt;
+		colGuess = colInitHunt - 1;
+		pos = 3;
+	}
+
+	public void guessCheck(int mode) {
+		boolean guessed = this.isGuessed[rowGuess][colGuess];
+		if (guessed) {
+			if (mode == 0) {
+				if (pos == 0) {
+					rightInitial();
+					pos = 1;
+				}
+
+				if (pos == 1) {
+					downInitial();
+					pos = 2;
+				}
+				if (pos == 2) {
+					leftInitial();
+					pos = 3;
+				}
+				if (pos == 3) {
+					upInitial();
+					pos = 0;
+				}
+			} else {
+				isBacktrack = true;
+				if (pos == 0) {
+					downInitial();
+				}
+
+				if (pos == 1) {
+					leftInitial();
+				}
+				if (pos == 2) {
+					upInitial();
+					pos = 0;
+				}
+				if (pos == 3) {
+					rightInitial();
+					pos = 1;
+				}
+			}
+		}
+	}
+
+	public void boundaryCheck(int mode) {
+
+		if (mode == 0) {
+			if (rowGuess >= rowSize) {
+				rightInitial();
+			}
+
+			if (colGuess >= colSize) {
+				downInitial();
+			}
+			if (rowGuess < 0) {
+				leftInitial();
+			}
+			if (colGuess < 0) {
+				upInitial();
+			}
+		} else {
 			
+			if (rowGuess >= rowSize) {
+				downInitial();
+				isBacktrack = true;
+			}
+
+			if (colGuess >= colSize) {
+				leftInitial();
+				isBacktrack = true;
+			}
+			if (rowGuess < 0) {
+				upInitial();
+				isBacktrack = true;
+			}
+			if (colGuess < 0) {
+				rightInitial();
+				isBacktrack = true;
+			}
 		}
-		
-//		if (pos == 0) {
-//			colHunt = colGuess - 2 + 1;
-//			
-//		}
-//
-//		if (pos == 1) {
-//			colHunt = colGuess - 2 - 1;
-//		}
-//
-//		if (pos == 2) {
-//			rowHunt = rowGuess - 2 + 1;
-//		}
-//
-//		if (pos == 3) {
-//			rowHunt = rowGuess - 2 - 1;
-//		}
+
 	}
 
-	// Found one
-	// backtrack dist = 3
-	// Check if row or col
-	// row/col + 1
-	// backtrack dist + 1
-	// if failed
-	// row/col - backtrack
+	//
+	// } else if (pos == 1) {
+	//
+	// } else if (pos == 2) {
+	//
+	// } else if (pos == 3) {
+	//
+	// }
 
-	public void huntProgress(int pos) {
-		
-		if(pos ==1) {
-			huntTargetRow = (rowHunt --);
-		} else if( pos ==2) {
-			huntTargetCol = (colHunt ++);
-		} else if (pos ==3) {
-			huntTargetRow =(rowHunt ++);
-		} else if (pos ==4) {
-			huntTargetCol = (colHunt --);
-		}
-		
-//		boolean isbackTrack = false;
-//
-//		if (isbackTrack == false) {
-//			if (pos == 0) {
-//				colHunt++;
-//				backDist++;
-//			} else if (pos == 1) {
-//				colHunt--;
-//				backDist--;
-//			} else if (pos == 2) {
-//				rowHunt++;
-//				backDist++;
-//			} else if (pos == 3) {
-//				rowHunt--;
-//				backDist--;
-//			}
-//		} else {
-//			if (pos == 0) {
-//				colHunt -= backDist;
-//			} else if (pos == 1) {
-//				colHunt += backDist;
-//			} else if (pos == 2) {
-//				rowHunt -= backDist;
-//			} else if (pos == 3) {
-//				rowHunt += backDist;
-//			}
-//			isbackTrack = true;
-//			backDist = 2;
-//		}
-//
-//		if (isbackTrack == true) {
-//			if (pos == 0) {
-//				colHunt--;
-//			} else if (pos == 1) {
-//				colHunt++;
-//			} else if (pos == 2) {
-//				rowHunt--;
-//			} else if (pos == 3) {
-//				rowHunt++;
-//			}
-//		}
+	// public boolean boundaryCheck() {
+	// boolean isOut = true;
+	// if (rowGuess >= rowSize) {
+	// rowGuess = rowInitHunt;
+	// pos = 1;
+	// } else if (colGuess >= colSize) {
+	// colGuess = colInitHunt;
+	// pos = 2;
+	// } else if (rowGuess < 0) {
+	// rowGuess = rowInitHunt;
+	// pos = 3;
+	// } else if (colGuess < 0) {
+	// colGuess = colInitHunt;
+	// pos = 0;
+	// } else {
+	// isOut = false;
+	// }
+	// return isOut;
+	// }
 
-	}
+	// public void initialHunt() {
+	// int i = 0;
+	// int j = 0;
+	//
+	// do {
+	// if (pos == 0) {
+	// rowInitHunt = rowGuess;
+	// colInitHunt = colGuess + 1;
+	// } else if (pos == 1) {
+	// rowInitHunt = rowGuess + 1;
+	// colInitHunt = colGuess;
+	// } else if (pos == 2) {
+	// rowInitHunt = rowGuess;
+	// colInitHunt = colGuess - 1;
+	// } else if (pos == 3) {
+	// rowInitHunt = rowGuess - 1;
+	// colInitHunt = colGuess;
+	// }
+	//
+	// } while (this.isGuessed[i][j] != false);
+	// pos++;
+	//
+	// }
 
 	public ArrayList<Integer> parityGen(int config, int line) {
 		ArrayList<Integer> lineElem = new ArrayList<>();
-		
+
 		if (config == 0) {
 			line--;
 			while (line > -1) {
@@ -228,7 +296,7 @@ public class GreedyGuessPlayer implements Player {
 		}
 
 		if (config == 1) {
-			line-=2;
+			line -= 2;
 			while (line > -1) {
 				lineElem.add(line);
 				line -= 2;
@@ -239,7 +307,7 @@ public class GreedyGuessPlayer implements Player {
 
 	@Override
 	public Guess makeGuess() {
-		
+
 		Random rando = new Random();
 		int rowIndex;
 		int colIndex;
@@ -247,121 +315,139 @@ public class GreedyGuessPlayer implements Player {
 		int j = 0;
 		int config;
 		Guess randoGuess = new Guess();
-		
-		if(this.isHunt != true ) {
-	
+
+		if (this.isHunt != true) {
+
 			ArrayList<Integer> rowConfig0 = parityGen(0, this.rowSize);
 			ArrayList<Integer> rowConfig1 = parityGen(1, this.rowSize);
-	
+
 			ArrayList<Integer> colConfig0 = parityGen(0, this.colSize);
 			ArrayList<Integer> colConfig1 = parityGen(1, this.colSize);
-	
+
 			do {
 				config = rando.nextInt(2);
-	
+
 				if (config == 0) {
 					rowIndex = rando.nextInt(rowConfig0.size());
 					colIndex = rando.nextInt(colConfig1.size());
 					i = rowConfig0.get(rowIndex);
 					j = colConfig1.get(colIndex);
-					
+
 				} else if (config == 1) {
 					rowIndex = rando.nextInt(rowConfig1.size());
 					colIndex = rando.nextInt(colConfig0.size());
 					i = rowConfig1.get(rowIndex);
 					j = colConfig0.get(colIndex);
 				}
-	
+
 			} while (this.isGuessed[i][j] != false);
-		
 
-			randoGuess.row = i;
-			randoGuess.column = j;
+			if (resetLoop) /* Used for testing */ {
 
-	
+				randoGuess.row = i;
+				randoGuess.column = j;
+				rowGuess = i;
+				colGuess = j;
+			} else {
+				// Test variables
+				randoGuess.row = 9;
+				randoGuess.column = 1;
+			}
+
 			this.isGuessed[i][j] = true;
-		
-			rowGuess = j;
-			colGuess = i;
-			
-			
-			
+
 			return randoGuess;
 		} else {
-			
-			if(this.huntCount ==3) { //Checks hunts have been done no more than 4 times
-				this.isHunt = false;
-				huntCount =0;
-				
-			} else {
-				this.huntCount ++;
-			}
 
-				huntPos ++;
-				
-				
-				huntProgress(huntPos);
-				huntInit(huntPos); 
-				
-				randoGuess.row = huntTargetRow;
-				randoGuess.column = huntTargetCol;
-				
-				
-//				USE SOMETHING ELSE TO STORE CURRENT SHOT NOT HUNTCOL AND HUNTROW 
-//				return randoGuess;
-//					 do {
-//					
-//						 huntInit(pos);
-//				
-//					 	 huntProgress(pos);
-//						 guess.row = rowHunt;
-//						 guess.column = colHunt;
-//						 if (pos < 4) {
-//						 pos++;
-//					 
-//					
-//					 if (pos == 4) {
-//					
-//					 	}
-//					 } else {
-//						 guess.row = rowGuess;
-//						 guess.column = colGuess;
-//						 generateNextGuess();
-//					 }
-//					
-//					 if (guess.row < 0 || guess.column < 0 || guess.row > 9 || guess.column >9) {
-//						 guess.row = rowGuess;
-//						 guess.column = colGuess;
-//						 generateNextGuess();
-//					 }
-//					 }while (this.isGuessed[guess.row][guess.column]);
-//					
-//						 this.isGuessed[guess.row][guess.column] = true;
-//						
-//						 if (guess.row < 0 || guess.column < 0 || guess.row > 9 || guess.column > 9) {
-//					
-//					 }
+			randoGuess.row = rowGuess;
+			randoGuess.column = colGuess;
 
-			}
-		return randoGuess;
+			this.isGuessed[randoGuess.row][randoGuess.column] = true;
+			return randoGuess;
 		}
-		
 
-
-	
+	}
 
 	@Override
 	public void update(Guess guess, Answer answer) {
-		if (answer.isHit == true) {
-		
-			this.isHunt =true;
-			huntPos = 0; //Resets hunt stats to start hunting from last hit
-			colHunt =guess.column;
-			rowHunt = guess.row;
 
-		
-			
-			
+		if (!this.isHunt && answer.isHit) {
+			this.isHunt = true;
+			this.isInitialHunt = true;
+			huntPos = 0; // Resets hunt stats to start hunting from last
+							// hit
+			colInitHunt = guess.column;
+			rowInitHunt = guess.row;
+			colGuess = colInitHunt;
+			rowGuess = rowInitHunt;
+			isFirstGuess = true;
+		}
+
+		if (this.isHunt) {
+			if (answer.isHit && !isFirstGuess) {
+				hitPos = pos;
+				isInitialHunt = false;
+				if (!isBacktrack) {
+					if (pos == 0) {
+						rowGuess++;
+					} else if (pos == 1) {
+						colGuess++;
+					} else if (pos == 2) {
+						rowGuess--;
+					} else if (pos == 3) {
+						colGuess--;
+					}
+					boundaryCheck(1);
+				} else {
+					if (pos == 0) {
+						rowGuess--;
+					} else if (pos == 1) {
+						colGuess--;
+					} else if (pos == 2) {
+						rowGuess++;
+					} else if (pos == 3) {
+						colGuess++;
+					}
+				}
+			}
+
+			if (!answer.isHit) {
+				if (isInitialHunt) {
+					pos++;
+				} else {
+					if (pos == 0) {
+						downInitial();
+					} else if (pos == 1) {
+						leftInitial();
+					} else if (pos == 2) {
+						upInitial();
+					} else if (pos == 3) {
+						rightInitial();
+					}
+					isBacktrack = true;
+				}
+			}
+
+			if (isInitialHunt) {
+				if (pos == 0) {
+					upInitial();
+				} else if (pos == 1) {
+					rightInitial();
+				} else if (pos == 2) {
+					downInitial();
+				} else if (pos == 3) {
+					leftInitial();
+				}
+				boundaryCheck(0);
+				isFirstGuess = false;
+			}
+		}
+
+		if (answer.shipSunk != null) {
+			this.isHunt = false;
+			isBacktrack = false;
+			resetLoop = true;
+			pos = 0;
 		}
 	} // end of update()
 
