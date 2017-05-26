@@ -91,7 +91,7 @@ public class RandomGuessPlayer implements Player{
     * Creates two random ints within the world size to return as shot coordinates 
     */
     @Override
-    public Guess makeGuess() 
+    public Guess makeGuess() {
         Random rando = new Random();
         int i;
         int j;
@@ -120,7 +120,7 @@ public class RandomGuessPlayer implements Player{
     public void update(Guess guess, Answer answer) {
     	//As it shot is random, updating is not super important
        
-    } /
+    } 
 
 
     @Override
