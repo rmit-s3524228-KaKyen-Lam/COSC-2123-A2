@@ -12,6 +12,7 @@ public class MonteCalc {
 	private String down = "down";
 	private String left = "left";
 	private String right = "right";
+	public static boolean[][] isGuessed = new boolean[10][10];
 	public static int[][] zeroScore = new int[10][10];
 	
 
@@ -43,7 +44,7 @@ public class MonteCalc {
 		public void getScore() {
 			for (int i = 0; i < maxCol; i++) {
 				for (int j = 0; j < maxRow; j++) {
-						System.out.print(j + "\t");
+						System.out.print(score[j][i] + "\t");
 					}
 				System.out.println();
 				}
@@ -355,28 +356,34 @@ public class MonteCalc {
 
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				if (score[j][i] == 0) {
+				if (score[j][i] == 0 && !isGuessed[j][i]) {
+					
 					if (i + 1 < maxRow) {
-							decrement(score, j, i + 1, length, up);
+							decrement(score, j, i + 1, length - 1, up);
 					}
 
 					if (j + 1 < maxCol) {
-							decrement(score, j + 1, i, length, right);
+							decrement(score, j + 1, i, length - 1, right);
 					}
 
 					if (i - 1 >= 0) {
-							decrement(score, j, i - 1, length, down);
+							decrement(score, j, i - 1, length - 1, down);
 					}
 					if (j - 1 >= 0) {
-							decrement(score, j - 1, i, length, left);
+							decrement(score, j - 1, i, length - 1, left);
 					}
+
 				}
 
 				if (score[j][i] < 0) {
 					score[j][i] = 0;
 				}
 				
+				if (score[j][i] != 0) {
 				list.add(score[j][i]);
+				}
+				
+				
 			}
 		}
 

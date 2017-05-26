@@ -227,35 +227,42 @@ public class MonteCarloGuessPlayer implements Player {
 	public void scoreUpdate(Ship select, int column, int row) {
 
 		MonteCalc.zeroScore[column][row] = 0;
-		
+
 		if (select == aircraftCarrier) {
 			ac.clearList();
 			ac.reCalc();
+			ac.getScore();
 		} else if (select == battleship) {
 			battle.clearList();
 			battle.reCalc();
+			battle.getScore();
 		} else if (select == cruiser) {
 			cruise.clearList();
 			cruise.reCalc();
+			cruise.getScore();
 		} else if (select == submarine) {
 			sub.clearList();
 			sub.reCalc();
+			sub.getScore();
 		} else if (select == destroyer) {
 			destroy.clearList();
 			destroy.reCalc();
+			destroy.getScore();
 		}
+
+		MonteCalc.isGuessed[column][row] = true;
 
 	}
 
-
-
 	public int[] monteSelect(Ship select, int index) {
 		if (select == aircraftCarrier) {
+
 			return ac.targetCalc(index);
 		} else if (select == battleship) {
+
 			return battle.targetCalc(index);
 		} else if (select == cruiser) {
-			cruise.getScore();
+
 			return cruise.targetCalc(index);
 		} else if (select == submarine) {
 			return sub.targetCalc(index);
@@ -264,24 +271,8 @@ public class MonteCarloGuessPlayer implements Player {
 		}
 
 	}
-	
-	public void resetScore(Ship select, int column, int row) {
-		if (select == aircraftCarrier) {
-			ac.resetScore(column,row);
-		} else if (select == battleship) {
-			battle.resetScore(column,row);
-		} else if (select == cruiser) {
-			cruise.resetScore(column,row);
-		} else if (select == submarine) {
-			sub.resetScore(column,row);
-		} else {
-			destroy.resetScore(column,row);
-		}
 
-	}
 	
-	
-
 	@Override
 	public Guess makeGuess() {
 
@@ -291,30 +282,24 @@ public class MonteCarloGuessPlayer implements Player {
 		int config;
 		int index = 0;
 		Guess guess = new Guess();
+		selectedShip = shipSelection();
 
 		if (this.isFound != true) {
 			// if ship has not been found
 
 			do {
 
-				selectedShip = shipSelection();
 				int[] gridSelect = monteSelect(selectedShip, index);
 				guess.column = gridSelect[0];
 				guess.row = gridSelect[1];
 
 				if (this.isGuessed[guess.column][guess.row]) {
-					index++;
-					if (index == 3) {
-						cruise.getScore();
-					}
-					}
-					
+					scoreUpdate(selectedShip, guess.column, guess.row);
+					MonteCalc.isGuessed[guess.row][guess.column] = true;
+
+				}
 
 			} while (this.isGuessed[guess.column][guess.row] != false);
-
-			rowTarget = guess.row;
-			colTarget = guess.column;
-			index = 0;
 
 			this.isGuessed[guess.column][guess.row] = true;
 
@@ -328,15 +313,18 @@ public class MonteCarloGuessPlayer implements Player {
 			// guess.row = 3;
 			// guess.column = 4;
 			// }
-
 			return guess;
 		} else {
 			// if ship has been found
 
 			guess.row = rowTarget;
 			guess.column = colTarget;
+			scoreUpdate(selectedShip, guess.column, guess.row);
 
 			this.isGuessed[guess.row][guess.column] = true;
+			MonteCalc.isGuessed[guess.row][guess.column] = true;
+
+
 			return guess;
 		}
 
@@ -435,8 +423,8 @@ public class MonteCarloGuessPlayer implements Player {
 			}
 		}
 		scoreUpdate(selectedShip, guess.column, guess.row);
+		MonteCalc.isGuessed[guess.row][guess.column] = true;
 		// resetLoop = true; //for testing
-
 
 	} // end of update()
 
