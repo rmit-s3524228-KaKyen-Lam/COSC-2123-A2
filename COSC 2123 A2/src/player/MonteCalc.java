@@ -1,5 +1,8 @@
 package player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class MonteCalc {
 
 	private static int maxCol = 10;
@@ -9,6 +12,136 @@ public class MonteCalc {
 	private String left = "left";
 	private String right = "right";
 	private static int[][] zeroScore = new int[10][10];
+
+	public class CarrierCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 5;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+
+	public class BattleShipCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 4;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+
+	public class SubmarineCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 3;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+
+	public class CruiserCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 3;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+
+	public class DestroyerCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 2;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
 
 	public static void popZeroScore() {
 		for (int i = 0; i < maxCol; i++) {
@@ -163,170 +296,75 @@ public class MonteCalc {
 
 		return score;
 	}
-	
-	public class ShipCalc {
-		
-		
-		MonteCalc mc = new MonteCalc();
-		
-		public ShipCalc(int length) {
-			this.length = length;
-			this.maxScore = length * 2;
-			
+
+	public static ArrayList heapInit(ArrayList<Integer> inputArrayList, ArrayList<Integer> outPutArrayList) {
+		int[] sortArray = new int[inputArrayList.size()];// Gets arraylist size
+															// for array[int]
+
+		for (int j = 0; j < inputArrayList.size(); j++) {// Adds from arraylist
+															// to array
+			int i = inputArrayList.get(j);
+			sortArray[j] = i;
 		}
-		private int length;
-		private int maxScore;
-		private int[][] hScore = mc.scoreGenerator(length, 0);
-		private int[][] vScore = mc.scoreGenerator(length, 1);
-		private int[][] score = mc.scoreCombiner(hScore, vScore);
-		
-		
 
+		sort(sortArray);
 
-		
+		for (int j = 0; j < sortArray.length; j++) {// Adds from arraylist to
+													// array
+			int i = sortArray[j];
+			outPutArrayList.add(i);
+
+		}
+		Collections.reverse(outPutArrayList);
+		return outPutArrayList;
 	}
 
-//	public class BattleShipCalc extends ShipCalc{
-//
-//		public BattleShipCalc() {
-//			
-//		}
-//
-//
-//		public void reCalc() {
-//			MonteCalc.currentHits(score);
-//			scoreCalc(score, maxScore, length);
-//		}
-//
-//		public void print() {
-//			for (int j = 0; j < maxCol; j++) {
-//				for (int i = 0; i < maxRow; i++) {
-//					System.out.print("[" + score[i][j] + "]\t");
-//				}
-//				System.out.println();
-//			}
-//			System.out.println();
-//		}
-//
-//	}
-	
-	public class CarrierCalc {
-
-		MonteCalc mc = new MonteCalc();
-		private int length = 5;
-		private int maxScore = length * 2;
-		private int[][] hScore = mc.scoreGenerator(length, 0);
-		private int[][] vScore = mc.scoreGenerator(length, 1);
-		private int[][] score = mc.scoreCombiner(hScore, vScore);
-
-
-		public void reCalc() {
-			MonteCalc.currentHits(score);
-			scoreCalc(score, maxScore, length);
+	public static void sort(int inputArray[]) {
+		for (int i = inputArray.length / 2 - 1; i >= 0; i--) {// Havles the
+																// array
+			heapShift(inputArray, inputArray.length, i);
 		}
-
-		public void print() {
-			for (int j = 0; j < maxCol; j++) {
-				for (int i = 0; i < maxRow; i++) {
-					System.out.print("[" + score[i][j] + "]\t");
-				}
-				System.out.println();
-			}
-			System.out.println();
+		for (int i = inputArray.length - 1; i >= 0; i--)// Takes biggest element
+														// to top
+		{
+			int temp = inputArray[0];
+			inputArray[0] = inputArray[i];
+			inputArray[i] = temp;
+			heapShift(inputArray, i, 0);
 		}
-
 	}
-	
-	public class SubmarineCalc {
 
-		MonteCalc mc = new MonteCalc();
-		private int length = 3;
-		private int maxScore = length * 2;
-		private int[][] hScore = mc.scoreGenerator(length, 0);
-		private int[][] vScore = mc.scoreGenerator(length, 1);
-		private int[][] score = mc.scoreCombiner(hScore, vScore);
+	static void heapShift(int arr[], int arrayLength, int root) {
 
+		int leftIndex = 2 * root + 1;
+		int rightIndex = 2 * root + 2;
+		int bigElem = root;
 
-		public void reCalc() {
-			MonteCalc.currentHits(score);
-			scoreCalc(score, maxScore, length);
+		if (leftIndex < arrayLength && arr[leftIndex] > arr[bigElem])
+			bigElem = leftIndex;
+
+		if (rightIndex < arrayLength && arr[rightIndex] > arr[bigElem])
+			bigElem = rightIndex;
+
+		if (bigElem != root) {
+
+			int swap = arr[root];
+			arr[root] = arr[bigElem];
+			arr[bigElem] = swap;
+			heapShift(arr, arrayLength, bigElem);
 		}
-
-		public void print() {
-			for (int j = 0; j < maxCol; j++) {
-				for (int i = 0; i < maxRow; i++) {
-					System.out.print("[" + score[i][j] + "]\t");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-
 	}
-	
-	public class CruiserCalc {
-
-		MonteCalc mc = new MonteCalc();
-		private int length = 3;
-		private int maxScore = length * 2;
-		private int[][] hScore = mc.scoreGenerator(length, 0);
-		private int[][] vScore = mc.scoreGenerator(length, 1);
-		private int[][] score = mc.scoreCombiner(hScore, vScore);
-
-
-		public void reCalc() {
-			MonteCalc.currentHits(score);
-			scoreCalc(score, maxScore, length);
-		}
-
-		public void print() {
-			for (int j = 0; j < maxCol; j++) {
-				for (int i = 0; i < maxRow; i++) {
-					System.out.print("[" + score[i][j] + "]\t");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-
-	}
-	
-	public class DestroyerCalc {
-
-		MonteCalc mc = new MonteCalc();
-		private int length = 2;
-		private int maxScore = length * 2;
-		private int[][] hScore = mc.scoreGenerator(length, 0);
-		private int[][] vScore = mc.scoreGenerator(length, 1);
-		private int[][] score = mc.scoreCombiner(hScore, vScore);
-
-
-		public void reCalc() {
-			MonteCalc.currentHits(score);
-			scoreCalc(score, maxScore, length);
-		}
-
-		public void print() {
-			for (int j = 0; j < maxCol; j++) {
-				for (int i = 0; i < maxRow; i++) {
-					System.out.print("[" + score[i][j] + "]\t");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-
-	}
-	
 
 	public static void main(String[] args) {
 		MonteCalc mc = new MonteCalc();
 		MonteCalc.popZeroScore();
 		MonteCalc.CarrierCalc car = mc.new CarrierCalc();
-//		MonteCalc.BattleShipCalc battle = mc.new BattleShipCalc();
+		MonteCalc.BattleShipCalc battle = mc.new BattleShipCalc();
 		MonteCalc.CruiserCalc cruise = mc.new CruiserCalc();
 		MonteCalc.SubmarineCalc sub = mc.new SubmarineCalc();
 		MonteCalc.DestroyerCalc destroy = mc.new DestroyerCalc();
+		battle.reCalc();
+		battle.print();
 	}
-	
+
 }
