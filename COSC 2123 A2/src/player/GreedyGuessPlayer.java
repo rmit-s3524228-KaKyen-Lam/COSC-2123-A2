@@ -216,7 +216,7 @@ public class GreedyGuessPlayer implements Player {
 		int i = 0;
 		int j = 0;
 		int config;
-		Guess randoGuess = new Guess();
+		Guess guess = new Guess();
 
 		if (this.isFound != true) {
 			// if ship has not been found
@@ -245,32 +245,32 @@ public class GreedyGuessPlayer implements Player {
 
 			} while (this.isGuessed[i][j] != false);
 
-			randoGuess.row = i;
-			randoGuess.column = j;
+			guess.row = i;
+			guess.column = j;
 			rowTarget = i;
 			colTarget = j;
 			this.isGuessed[i][j] = true;
 
 			// if (resetLoop) /* Used for testing */ {
-			// randoGuess.row = i;
-			// randoGuess.column = j;
+			// guess.row = i;
+			// guess.column = j;
 			// rowTarget = i;
 			// colTarget = j;
 			// } else {
 			// // Test variables
-			// randoGuess.row = 3;
-			// randoGuess.column = 4;
+			// guess.row = 3;
+			// guess.column = 4;
 			// }
 
-			return randoGuess;
+			return guess;
 		} else {
 			// if ship has been found
 
-			randoGuess.row = rowTarget;
-			randoGuess.column = colTarget;
+			guess.row = rowTarget;
+			guess.column = colTarget;
 
-			this.isGuessed[randoGuess.row][randoGuess.column] = true;
-			return randoGuess;
+			this.isGuessed[guess.row][guess.column] = true;
+			return guess;
 		}
 
 	}

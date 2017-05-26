@@ -1,20 +1,19 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
-import java.util.Scanner;
+import java.util.Set;
 
-import player.GreedyGuessPlayer.OwnShip;
 import ship.Ship;
 import world.World;
 
 /**
- * Monte Carlo guess player (task C).
- * Please implement this class.
+ * Monte Carlo guess player (task C). Please implement this class.
  *
  * @author Youhan, Jeffrey
  */
-public class MonteCarloGuessPlayer  implements Player{
+public class MonteCarloGuessPlayer implements Player {
 
 	public class OwnShip {
 		Ship ship = null;
@@ -46,6 +45,21 @@ public class MonteCarloGuessPlayer  implements Player{
 									// initial hit has been checked
 	private boolean isFirstHit = true;
 
+	private MonteCalc mc;
+	private MonteCalc.AircraftCarrierCalc ac;
+	private MonteCalc.BattleShipCalc battle;
+	private MonteCalc.CruiserCalc cruise;
+	private MonteCalc.SubmarineCalc sub;
+	private MonteCalc.DestroyerCalc destroy;
+
+	private ArrayList<Ship> remainingShips = new ArrayList<>();
+	private ship.AircraftCarrier aircraftCarrier = new ship.AircraftCarrier();
+	private ship.Battleship battleship = new ship.Battleship();
+	private ship.Cruiser cruiser = new ship.Cruiser();
+	private ship.Submarine submarine = new ship.Submarine();
+	private ship.Destroyer destroyer = new ship.Destroyer();
+	private Ship selectedShip;
+
 	/* For testing */
 	// private boolean resetLoop = false;
 
@@ -65,6 +79,25 @@ public class MonteCarloGuessPlayer  implements Player{
 			}
 			i++;
 		}
+
+		remainingShips.add(aircraftCarrier);
+		remainingShips.add(battleship);
+		remainingShips.add(cruiser);
+		remainingShips.add(submarine);
+		remainingShips.add(destroyer);
+
+		this.mc = new MonteCalc();
+		mc.popZeroScore();
+		ac = this.mc.new AircraftCarrierCalc();
+		ac.reCalc();
+		battle = this.mc.new BattleShipCalc();
+		battle.reCalc();
+		cruise = this.mc.new CruiserCalc();
+		cruise.reCalc();
+		sub = this.mc.new SubmarineCalc();
+		sub.reCalc();
+		destroy = this.mc.new DestroyerCalc();
+		destroy.reCalc();
 
 	} // end of initialisePlayer()
 
@@ -175,6 +208,78 @@ public class MonteCarloGuessPlayer  implements Player{
 
 	}
 
+	public Ship shipSelection() {
+
+		if (remainingShips.contains(aircraftCarrier)) {
+			return aircraftCarrier;
+		} else if (remainingShips.contains(battleship)) {
+			return battleship;
+		} else if (remainingShips.contains(cruiser)) {
+			return cruiser;
+		} else if (remainingShips.contains(submarine)) {
+			return submarine;
+		} else {
+			return destroyer;
+		}
+
+	}
+
+	public void scoreUpdate(Ship select, int column, int row) {
+
+		MonteCalc.zeroScore[column][row] = 0;
+		
+		if (select == aircraftCarrier) {
+			ac.clearList();
+			ac.reCalc();
+		} else if (select == battleship) {
+			battle.clearList();
+			battle.reCalc();
+		} else if (select == cruiser) {
+			cruise.clearList();
+			cruise.reCalc();
+		} else if (select == submarine) {
+			sub.clearList();
+			sub.reCalc();
+		} else if (select == destroyer) {
+			destroy.clearList();
+			destroy.reCalc();
+		}
+
+	}
+
+
+
+	public int[] monteSelect(Ship select, int index) {
+		if (select == aircraftCarrier) {
+			return ac.targetCalc(index);
+		} else if (select == battleship) {
+			return battle.targetCalc(index);
+		} else if (select == cruiser) {
+			cruise.getScore();
+			return cruise.targetCalc(index);
+		} else if (select == submarine) {
+			return sub.targetCalc(index);
+		} else {
+			return destroy.targetCalc(index);
+		}
+
+	}
+	
+	public void resetScore(Ship select, int column, int row) {
+		if (select == aircraftCarrier) {
+			ac.resetScore(column,row);
+		} else if (select == battleship) {
+			battle.resetScore(column,row);
+		} else if (select == cruiser) {
+			cruise.resetScore(column,row);
+		} else if (select == submarine) {
+			sub.resetScore(column,row);
+		} else {
+			destroy.resetScore(column,row);
+		}
+
+	}
+	
 	
 
 	@Override
@@ -183,47 +288,56 @@ public class MonteCarloGuessPlayer  implements Player{
 		Random rando = new Random();
 		int rowIndex;
 		int colIndex;
-		int i = 0;
-		int j = 0;
 		int config;
-		Guess randoGuess = new Guess();
+		int index = 0;
+		Guess guess = new Guess();
 
 		if (this.isFound != true) {
 			// if ship has not been found
-			
+
 			do {
-			
-			//TODO Monte Carlo algorithm
-			
 
-			} while (this.isGuessed[i][j] != false);
+				selectedShip = shipSelection();
+				int[] gridSelect = monteSelect(selectedShip, index);
+				guess.column = gridSelect[0];
+				guess.row = gridSelect[1];
 
-			randoGuess.row = i;
-			randoGuess.column = j;
-			rowTarget = i;
-			colTarget = j;
-			this.isGuessed[i][j] = true;
+				if (this.isGuessed[guess.column][guess.row]) {
+					index++;
+					if (index == 3) {
+						cruise.getScore();
+					}
+					}
+					
+
+			} while (this.isGuessed[guess.column][guess.row] != false);
+
+			rowTarget = guess.row;
+			colTarget = guess.column;
+			index = 0;
+
+			this.isGuessed[guess.column][guess.row] = true;
 
 			// if (resetLoop) /* Used for testing */ {
-			// randoGuess.row = i;
-			// randoGuess.column = j;
+			// guess.row = i;
+			// guess.column = j;
 			// rowTarget = i;
 			// colTarget = j;
 			// } else {
 			// // Test variables
-			// randoGuess.row = 3;
-			// randoGuess.column = 4;
+			// guess.row = 3;
+			// guess.column = 4;
 			// }
 
-			return randoGuess;
+			return guess;
 		} else {
 			// if ship has been found
 
-			randoGuess.row = rowTarget;
-			randoGuess.column = colTarget;
+			guess.row = rowTarget;
+			guess.column = colTarget;
 
-			this.isGuessed[randoGuess.row][randoGuess.column] = true;
-			return randoGuess;
+			this.isGuessed[guess.row][guess.column] = true;
+			return guess;
 		}
 
 	}
@@ -308,9 +422,21 @@ public class MonteCarloGuessPlayer  implements Player{
 
 		if (answer.shipSunk != null) {
 			this.isFound = false;
-			// resetLoop = true; //for testing
-
+			if (answer.shipSunk.name().equals(aircraftCarrier.name())) {
+				remainingShips.remove(aircraftCarrier);
+			} else if (answer.shipSunk.name().equals(battleship.name())) {
+				remainingShips.remove(battleship);
+			} else if (answer.shipSunk.name().equals(cruiser.name())) {
+				remainingShips.remove(cruiser);
+			} else if (answer.shipSunk.name().equals(submarine.name())) {
+				remainingShips.remove(submarine);
+			} else if (answer.shipSunk.name().equals(destroyer.name())) {
+				remainingShips.remove(destroyer);
+			}
 		}
+		scoreUpdate(selectedShip, guess.column, guess.row);
+		// resetLoop = true; //for testing
+
 
 	} // end of update()
 
@@ -324,5 +450,5 @@ public class MonteCarloGuessPlayer  implements Player{
 			}
 		}
 		return true;
-	} // end of noRemainingShips() 
+	} // end of noRemainingShips()
 } // end of class MonteCarloGuessPlayer
