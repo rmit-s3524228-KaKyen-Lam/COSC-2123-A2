@@ -8,19 +8,19 @@ public class MonteCalc {
 	private String down = "down";
 	private String left = "left";
 	private String right = "right";
-	private static int[][] zeroGrid = new int[10][10];
+	private static int[][] zeroScore = new int[10][10];
 
-	public static void popZeroGrid() {
+	public static void popZeroScore() {
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				zeroGrid[j][i] = -1;
+				zeroScore[j][i] = -1;
 			}
 		}
 	}
 
-	public int[][] gridGenerator(int length, int config) {
+	public int[][] scoreGenerator(int length, int config) {
 
-		int[][] grid = new int[10][10];
+		int[][] score = new int[10][10];
 		int endPoint = 0;
 		int startPoint = 0;
 
@@ -30,9 +30,9 @@ public class MonteCalc {
 			while (length + endPoint <= maxRow) {
 				for (int j = startPoint; j < length + endPoint; j++) {
 					if (config == 0) {
-						grid[j][i] += 1;
+						score[j][i] += 1;
 					} else if (config == 1) {
-						grid[i][j] += 1;
+						score[i][j] += 1;
 					}
 				}
 				startPoint++;
@@ -40,45 +40,45 @@ public class MonteCalc {
 			}
 
 		}
-		return grid;
+		return score;
 	}
 
-	public int[][] gridCombiner(int[][] grid1, int[][] grid2) {
-		int[][] grid = new int[10][10];
+	public int[][] scoreCombiner(int[][] score1, int[][] score2) {
+		int[][] score = new int[10][10];
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				grid[j][i] = grid1[j][i] + grid2[j][i];
+				score[j][i] = score1[j][i] + score2[j][i];
 			}
 		}
 
-		return grid;
+		return score;
 	}
 
-	public static int[][] currentHits(int[][] grid) {
+	public static int[][] currentHits(int[][] score) {
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				if (zeroGrid[j][i] == 0) {
-					grid[j][i] = 0;
+				if (zeroScore[j][i] == 0) {
+					score[j][i] = 0;
 				}
 			}
 		}
 
-		return grid;
+		return score;
 	}
 
-	public void decrementLimit(int[][] grid, int column, int row) {
-		if (grid[column][row] <= 0 && zeroGrid[column][row] != 0) {
-			grid[column][row] = 1;
+	public void decrementLimit(int[][] score, int column, int row) {
+		if (score[column][row] <= 0 && zeroScore[column][row] != 0) {
+			score[column][row] = 1;
 		}
 	}
 
-	public void scoreLimit(int[][] grid, int column, int row) {
-		if (grid[column][row] < 0) {
-			grid[column][row] = 0;
+	public void scoreLimit(int[][] score, int column, int row) {
+		if (score[column][row] < 0) {
+			score[column][row] = 0;
 		}
 	}
 
-	public void decrement(int[][] grid, int column, int row, int length, String direction) {
+	public void decrement(int[][] score, int column, int row, int length, String direction) {
 
 		if (direction == up) {
 
@@ -86,9 +86,9 @@ public class MonteCalc {
 				length = maxRow - row;
 			}
 			for (int i = row; i < row + length; i++) {
-				grid[column][i]--;
-				decrementLimit(grid, column, i);
-				scoreLimit(grid, column, i);
+				score[column][i]--;
+				decrementLimit(score, column, i);
+				scoreLimit(score, column, i);
 			}
 		}
 
@@ -97,9 +97,9 @@ public class MonteCalc {
 				length = maxCol - column;
 			}
 			for (int i = column; i < column + length; i++) {
-				grid[i][row]--;
-				decrementLimit(grid, i, row);
-				scoreLimit(grid, i, row);
+				score[i][row]--;
+				decrementLimit(score, i, row);
+				scoreLimit(score, i, row);
 			}
 		}
 
@@ -108,9 +108,9 @@ public class MonteCalc {
 				length = row;
 			}
 			for (int i = row; i > row - length; i--) {
-				grid[column][i]--;
-				decrementLimit(grid, column, i);
-				scoreLimit(grid, column, i);
+				score[column][i]--;
+				decrementLimit(score, column, i);
+				scoreLimit(score, column, i);
 			}
 		}
 
@@ -119,90 +119,214 @@ public class MonteCalc {
 				length = column;
 			}
 			for (int i = column; i > column - length; i--) {
-				grid[i][row]--;
-				decrementLimit(grid, i, row);
-				scoreLimit(grid, i, row);
+				score[i][row]--;
+				decrementLimit(score, i, row);
+				scoreLimit(score, i, row);
 			}
 		}
 	}
 
-	public int[][] gridCalc(int[][] grid, int maxScore, int length) {
+	public int[][] scoreCalc(int[][] score, int maxScore, int length) {
 
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				if (grid[j][i] == 0) {
+				if (score[j][i] == 0) {
 					if (i + 1 < maxRow) {
-						if (grid[j][i + 1] < maxScore) {
-							decrement(grid, j, i + 1, length, up);
+						if (score[j][i + 1] < maxScore) {
+							decrement(score, j, i + 1, length, up);
 						}
 					}
 
 					if (j + 1 < maxCol) {
-						if (grid[j + 1][i] < maxScore) {
-							decrement(grid, j + 1, i, length, right);
+						if (score[j + 1][i] < maxScore) {
+							decrement(score, j + 1, i, length, right);
 						}
 					}
 
 					if (i - 1 >= 0) {
-						if (grid[j][i - 1] < maxScore) {
-							decrement(grid, j, i - 1, length, down);
+						if (score[j][i - 1] < maxScore) {
+							decrement(score, j, i - 1, length, down);
 						}
 					}
 					if (j - 1 >= 0) {
-						if (grid[j - 1][i] < maxScore) {
-							decrement(grid, j - 1, i, length, left);
+						if (score[j - 1][i] < maxScore) {
+							decrement(score, j - 1, i, length, left);
 						}
 					}
 				}
 
-				if (grid[j][i] < 0) {
-					grid[j][i] = 0;
+				if (score[j][i] < 0) {
+					score[j][i] = 0;
 				}
 			}
 		}
 
-		return grid;
+		return score;
+	}
+	
+	public class ShipCalc {
+		
+		
+		MonteCalc mc = new MonteCalc();
+		
+		public ShipCalc(int length) {
+			this.length = length;
+			this.maxScore = length * 2;
+			
+		}
+		private int length;
+		private int maxScore;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+		
+		
+
+
+		
 	}
 
-	public class BattleShipCalc {
+//	public class BattleShipCalc extends ShipCalc{
+//
+//		public BattleShipCalc() {
+//			
+//		}
+//
+//
+//		public void reCalc() {
+//			MonteCalc.currentHits(score);
+//			scoreCalc(score, maxScore, length);
+//		}
+//
+//		public void print() {
+//			for (int j = 0; j < maxCol; j++) {
+//				for (int i = 0; i < maxRow; i++) {
+//					System.out.print("[" + score[i][j] + "]\t");
+//				}
+//				System.out.println();
+//			}
+//			System.out.println();
+//		}
+//
+//	}
+	
+	public class CarrierCalc {
 
 		MonteCalc mc = new MonteCalc();
 		private int length = 5;
-		private int maxScore = 10;
-		private int[][] hGrid = mc.gridGenerator(length, 0);
-		private int[][] vGrid = mc.gridGenerator(length, 1);
-		private int[][] grid = mc.gridCombiner(hGrid, vGrid);
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
 
-		public void sampleHit() {
-			MonteCalc.zeroGrid[5][5] = 0;
-			MonteCalc.zeroGrid[4][5] = 0;
-			MonteCalc.zeroGrid[5][4] = 0;
-			MonteCalc.zeroGrid[4][4] = 0;
-		}
 
 		public void reCalc() {
-			MonteCalc.currentHits(grid);
-			gridCalc(grid, maxScore, length);
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
 		}
 
 		public void print() {
 			for (int j = 0; j < maxCol; j++) {
 				for (int i = 0; i < maxRow; i++) {
-					System.out.print("[" + grid[i][j] + "]\t");
+					System.out.print("[" + score[i][j] + "]\t");
 				}
 				System.out.println();
 			}
-
+			System.out.println();
 		}
 
 	}
+	
+	public class SubmarineCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 3;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+	
+	public class CruiserCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 3;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+	
+	public class DestroyerCalc {
+
+		MonteCalc mc = new MonteCalc();
+		private int length = 2;
+		private int maxScore = length * 2;
+		private int[][] hScore = mc.scoreGenerator(length, 0);
+		private int[][] vScore = mc.scoreGenerator(length, 1);
+		private int[][] score = mc.scoreCombiner(hScore, vScore);
+
+
+		public void reCalc() {
+			MonteCalc.currentHits(score);
+			scoreCalc(score, maxScore, length);
+		}
+
+		public void print() {
+			for (int j = 0; j < maxCol; j++) {
+				for (int i = 0; i < maxRow; i++) {
+					System.out.print("[" + score[i][j] + "]\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+
+	}
+	
 
 	public static void main(String[] args) {
 		MonteCalc mc = new MonteCalc();
-		MonteCalc.popZeroGrid();
-		MonteCalc.BattleShipCalc bs = mc.new BattleShipCalc();
-		bs.sampleHit();
-		bs.reCalc();
-		bs.print();
+		MonteCalc.popZeroScore();
+		MonteCalc.CarrierCalc car = mc.new CarrierCalc();
+//		MonteCalc.BattleShipCalc battle = mc.new BattleShipCalc();
+		MonteCalc.CruiserCalc cruise = mc.new CruiserCalc();
+		MonteCalc.SubmarineCalc sub = mc.new SubmarineCalc();
+		MonteCalc.DestroyerCalc destroy = mc.new DestroyerCalc();
 	}
+	
 }
