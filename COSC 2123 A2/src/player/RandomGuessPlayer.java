@@ -13,19 +13,20 @@ import java.util.Random;
 public class RandomGuessPlayer implements Player{
 
 	public class RandomShip {
+		 
 		Ship ship = null;
 		int[] rowCoord = { -1, -1, -1, -1, -1 };
 		int[] colCoord = { -1, -1, -1, -1, -1 };
-		boolean[] isdown = { true, true, true, true, true };
-
+		boolean[] isdown = { true, true, true, true, true }; //Checks status of each ship
+		
 		private RandomShip() {
 		}
 	}
 
 	private int rowSize = 0;
 	private int colSize = 0;
-	boolean[][] isGuessed;
-	RandomShip[] playerShips = new RandomShip[5];
+	boolean[][] isGuessed;//Boolean to check if both col and row guess have been made
+	RandomShip[] playerShips = new RandomShip[5]; 
 
 
 	@Override
@@ -35,8 +36,9 @@ public class RandomGuessPlayer implements Player{
 		this.colSize = world.numColumn;
 		
 		this.isGuessed = new boolean[this.rowSize][this.colSize];
-		int i = 0;
 		
+		int i = 0;
+		//Sets random ship locations to the world
 		for (World.ShipLocation shiploc : world.shipLocations) {
 			this.playerShips[i] = new RandomShip();
 			this.playerShips[i].ship = shiploc.ship;
@@ -44,6 +46,7 @@ public class RandomGuessPlayer implements Player{
 				this.playerShips[i].rowCoord[j] = shiploc.coordinates.get(j).row;
 				this.playerShips[i].colCoord[j] = shiploc.coordinates.get(j).column;
 				this.playerShips[i].isdown[j] = false;
+				
 			}
 			i++;
 		}
@@ -53,7 +56,7 @@ public class RandomGuessPlayer implements Player{
 
     @Override
     public Answer getAnswer(Guess guess) {
-
+	//Loops over players ship checking guess parameter against this players ship locations
     	Answer answer = new Answer();
 		for (int i = 0; i < 5; i++) {
 			
@@ -81,8 +84,7 @@ public class RandomGuessPlayer implements Player{
 		return answer;
 	} 
     @Override
-    public Guess makeGuess() {
-    	
+    public Guess makeGuess() //Creates two random ints within the world size to return as shot coordinates 
         Random rando = new Random();
         int i;
         int j;
@@ -90,7 +92,7 @@ public class RandomGuessPlayer implements Player{
 	        	{
 	          i = rando.nextInt(this.rowSize);
 	          j = rando.nextInt(this.colSize);
-	          
+	       
 	        	} while (this.isGuessed[i][j] != false);
 	        
 	        Guess randoGuess = new Guess();
@@ -100,7 +102,7 @@ public class RandomGuessPlayer implements Player{
 	        randoGuess.column = j;
 	        
 	        this.isGuessed[i][j] = true;
-	        
+	       
         return randoGuess;
       }
        
@@ -108,13 +110,13 @@ public class RandomGuessPlayer implements Player{
 
     @Override
     public void update(Guess guess, Answer answer) {
-    	
-        // To be implemented.
-    } // end of update()
+    	//As it shot is random, updating is not super important
+       
+    } /
 
 
     @Override
-    public boolean noRemainingShips() {
+    public boolean noRemainingShips() {//Loops over each ship to check if each has been sunk
     	{
     	    for (int i = 0; i < 5; i++) {
     	      for (int j = 0; j < this.playerShips[i].ship.len(); j++) {
