@@ -13,7 +13,7 @@ public class MonteCalc {
 	private String left = "left";
 	private String right = "right";
 	public static boolean[][] isGuessed = new boolean[10][10];
-	public static int[][] zeroScore = new int[10][10];
+	public int[][] zeroScore = new int[10][10];
 	ArrayList<Integer> rowConfig0 = parityGen(0, maxRow);
 	ArrayList<Integer> rowConfig1 = parityGen(1, maxRow);
 	ArrayList<Integer> colConfig0 = parityGen(0, maxCol);
@@ -35,7 +35,7 @@ public class MonteCalc {
 		private ArrayList<Integer> scoreList = new ArrayList<>();
 
 		public void reCalc() {
-			MonteCalc.currentHits(score);
+			currentHits(score);
 			scoreCalc(score, scoreList, length);
 		}
 
@@ -59,8 +59,14 @@ public class MonteCalc {
 			System.out.println();
 		}
 
-		public void resetScore(int column, int row) {
-			score[column][row]++;
+		public void resetScore() {
+			for (int i = 0; i < maxCol; i++) {
+				for (int j = 0; j < maxRow; j++) {
+					if (score[j][i] != 0) {
+						score[j][i]++;
+					}
+				}
+			}
 		}
 	}
 
@@ -79,7 +85,7 @@ public class MonteCalc {
 		private ArrayList<Integer> scoreList = new ArrayList<>();
 
 		public void reCalc() {
-			MonteCalc.currentHits(score);
+			currentHits(score);
 			scoreCalc(score, scoreList, length);
 		}
 
@@ -103,8 +109,14 @@ public class MonteCalc {
 			System.out.println();
 		}
 
-		public void resetScore(int column, int row) {
-			score[column][row]++;
+		public void resetScore() {
+			for (int i = 0; i < maxCol; i++) {
+				for (int j = 0; j < maxRow; j++) {
+					if (score[j][i] != 0) {
+						score[j][i]++;
+					}
+				}
+			}
 		}
 
 	}
@@ -123,7 +135,7 @@ public class MonteCalc {
 		private ArrayList<Integer> scoreList = new ArrayList<>();
 
 		public void reCalc() {
-			MonteCalc.currentHits(score);
+			currentHits(score);
 			scoreCalc(score, scoreList, length);
 		}
 
@@ -147,8 +159,14 @@ public class MonteCalc {
 			System.out.println();
 		}
 
-		public void resetScore(int column, int row) {
-			score[column][row]++;
+		public void resetScore() {
+			for (int i = 0; i < maxCol; i++) {
+				for (int j = 0; j < maxRow; j++) {
+					if (score[j][i] != 0) {
+						score[j][i]++;
+					}
+				}
+			}
 		}
 
 	}
@@ -168,7 +186,7 @@ public class MonteCalc {
 		private ArrayList<Integer> scoreList = new ArrayList<>();
 
 		public void reCalc() {
-			MonteCalc.currentHits(score);
+			currentHits(score);
 			scoreCalc(score, scoreList, length);
 		}
 
@@ -192,8 +210,14 @@ public class MonteCalc {
 			System.out.println();
 		}
 
-		public void resetScore(int column, int row) {
-			score[column][row]++;
+		public void resetScore() {
+			for (int i = 0; i < maxCol; i++) {
+				for (int j = 0; j < maxRow; j++) {
+					if (score[j][i] != 0) {
+						score[j][i]++;
+					}
+				}
+			}
 		}
 
 	}
@@ -213,7 +237,7 @@ public class MonteCalc {
 		private ArrayList<Integer> scoreList = new ArrayList<>();
 
 		public void reCalc() {
-			MonteCalc.currentHits(score);
+			currentHits(score);
 			scoreCalc(score, scoreList, length);
 		}
 
@@ -237,8 +261,14 @@ public class MonteCalc {
 			System.out.println();
 		}
 
-		public void resetScore(int column, int row) {
-			score[column][row]++;
+		public void resetScore() {
+			for (int i = 0; i < maxCol; i++) {
+				for (int j = 0; j < maxRow; j++) {
+					if (score[j][i] != 0) {
+						score[j][i]++;
+					}
+				}
+			}
 		}
 	}
 
@@ -318,10 +348,15 @@ public class MonteCalc {
 	 * @return
 	 */
 	public int[][] scoreCombiner(int[][] score1, int[][] score2) {
+		parityCreate();
 		int[][] score = new int[10][10];
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
-				score[j][i] = score1[j][i] + score2[j][i];
+				if (parityGrid[j][i]) {
+					score[j][i] = score1[j][i] + score2[j][i];
+				} else {
+					score[j][i] = 1;
+				}
 			}
 		}
 
@@ -336,7 +371,7 @@ public class MonteCalc {
 	 * @return score on coordinate
 	 */
 
-	public static int[][] currentHits(int[][] score) {
+	public int[][] currentHits(int[][] score) {
 		for (int i = 0; i < maxCol; i++) {
 			for (int j = 0; j < maxRow; j++) {
 				if (zeroScore[j][i] == 0) {
@@ -482,7 +517,7 @@ public class MonteCalc {
 					score[j][i] = 0;
 				}
 
-				if (score[j][i] != 0 && parityGrid[j][i]) {
+				if (score[j][i] != 0) {
 					list.add(score[j][i]);
 				}
 
