@@ -49,6 +49,7 @@ public class MonteCarloGuessPlayer implements Player {
 	private boolean isFirstHit = true;
 
 	private MonteCalc mc;
+
 	private MonteCalc.AircraftCarrierCalc ac;
 	private MonteCalc.BattleShipCalc battle;
 	private MonteCalc.CruiserCalc cruise;
@@ -90,6 +91,7 @@ public class MonteCarloGuessPlayer implements Player {
 		remainingShips.add(destroyer);
 
 		this.mc = new MonteCalc();
+		mc.parityCreate();
 		mc.popZeroScore();
 		ac = this.mc.new AircraftCarrierCalc();
 		ac.reCalc();
@@ -249,23 +251,18 @@ public class MonteCarloGuessPlayer implements Player {
 		if (select == aircraftCarrier) {
 			ac.clearList();
 			ac.reCalc();
-			ac.getScore();
 		} else if (select == battleship) {
 			battle.clearList();
 			battle.reCalc();
-			battle.getScore();
 		} else if (select == cruiser) {
 			cruise.clearList();
 			cruise.reCalc();
-			cruise.getScore();
 		} else if (select == submarine) {
 			sub.clearList();
 			sub.reCalc();
-			sub.getScore();
 		} else if (select == destroyer) {
 			destroy.clearList();
 			destroy.reCalc();
-			destroy.getScore();
 		}
 
 		MonteCalc.isGuessed[column][row] = true;
@@ -280,12 +277,10 @@ public class MonteCarloGuessPlayer implements Player {
 	 */
 	public int[] monteSelect(Ship select) {
 		if (select == aircraftCarrier) {
-
 			return ac.targetCalc();
 		} else if (select == battleship) {
 			return battle.targetCalc();
 		} else if (select == cruiser) {
-
 			return cruise.targetCalc();
 		} else if (select == submarine) {
 			return sub.targetCalc();

@@ -14,10 +14,12 @@ public class MonteCalc {
 	private String right = "right";
 	public static boolean[][] isGuessed = new boolean[10][10];
 	public static int[][] zeroScore = new int[10][10];
+	ArrayList<Integer> rowConfig0 = parityGen(0, maxRow);
+	ArrayList<Integer> rowConfig1 = parityGen(1, maxRow);
+	ArrayList<Integer> colConfig0 = parityGen(0, maxCol);
+	ArrayList<Integer> colConfig1 = parityGen(1, maxCol);
+	private boolean[][] parityGrid = new boolean[10][10];
 
-	
-	
-	
 	/**
 	 * Aircraft Carrier Calculation class
 	 * 
@@ -115,7 +117,6 @@ public class MonteCalc {
 
 		MonteCalc mc = new MonteCalc();
 		private int length = 3;
-		private int maxScore = 100;
 		private int[][] hScore = mc.scoreGenerator(length, 0);
 		private int[][] vScore = mc.scoreGenerator(length, 1);
 		private int[][] score = mc.scoreCombiner(hScore, vScore);
@@ -461,18 +462,18 @@ public class MonteCalc {
 				if (score[j][i] == 0 && !isGuessed[j][i]) {
 
 					if (i + 1 < maxRow) {
-						decrement(score, j, i + 1, length - 1, up);
+						decrement(score, j, i + 1, length, up);
 					}
 
 					if (j + 1 < maxCol) {
-						decrement(score, j + 1, i, length - 1, right);
+						decrement(score, j + 1, i, length, right);
 					}
 
 					if (i - 1 >= 0) {
-						decrement(score, j, i - 1, length - 1, down);
+						decrement(score, j, i - 1, length, down);
 					}
 					if (j - 1 >= 0) {
-						decrement(score, j - 1, i, length - 1, left);
+						decrement(score, j - 1, i, length, left);
 					}
 
 				}
@@ -481,7 +482,7 @@ public class MonteCalc {
 					score[j][i] = 0;
 				}
 
-				if (score[j][i] != 0) {
+				if (score[j][i] != 0 && parityGrid[j][i]) {
 					list.add(score[j][i]);
 				}
 
@@ -570,6 +571,52 @@ public class MonteCalc {
 			arr[root] = arr[bigElem];
 			arr[bigElem] = swap;
 			heapShift(arr, arrayLength, bigElem);
+		}
+	}
+
+	/**
+	 * Generate parity selection of board by creating lines of alternating
+	 * pattern based on line size
+	 * 
+	 * @param config
+	 *            Configuration for alternate line selection (0,1)
+	 * @param lineSize
+	 *            Size of line
+	 * @return
+	 */
+	public ArrayList<Integer> parityGen(int config, int lineSize) {
+		ArrayList<Integer> lineElem = new ArrayList<>();
+
+		if (config == 0) {
+			lineSize--;
+			while (lineSize > -1) {
+				lineElem.add(lineSize);
+				lineSize -= 2;
+			}
+		}
+
+		if (config == 1) {
+			lineSize -= 2;
+			while (lineSize > -1) {
+				lineElem.add(lineSize);
+				lineSize -= 2;
+			}
+		}
+		return lineElem;
+	}
+
+	public void parityCreate() {
+		for (int i = 0; i < maxCol; i++) {
+			for (int j = 0; j < maxRow; j++) {
+				if (colConfig0.contains(i) && rowConfig1.contains(j)) {
+					parityGrid[j][i] = true;
+				} else if (colConfig1.contains(i) && rowConfig0.contains(j)) {
+					parityGrid[j][i] = true;
+				} else {
+					parityGrid[j][i] = false;
+				}
+
+			}
 		}
 	}
 }
