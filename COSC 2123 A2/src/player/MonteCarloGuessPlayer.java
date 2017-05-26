@@ -13,6 +13,9 @@ import world.World;
  *
  * @author Youhan, Jeffrey
  */
+
+/* http://www.datagenetics.com/blog/december32011/ */
+
 public class MonteCarloGuessPlayer implements Player {
 
 	public class OwnShip {
@@ -208,6 +211,11 @@ public class MonteCarloGuessPlayer implements Player {
 
 	}
 
+	/**
+	 * Select ship
+	 * 
+	 * @return ship selected
+	 */
 	public Ship shipSelection() {
 
 		if (remainingShips.contains(aircraftCarrier)) {
@@ -224,6 +232,16 @@ public class MonteCarloGuessPlayer implements Player {
 
 	}
 
+	/**
+	 * Update score
+	 * 
+	 * @param select
+	 *            Ship selected
+	 * @param column
+	 *            column corrdinate
+	 * @param row
+	 *            row coordinate
+	 */
 	public void scoreUpdate(Ship select, int column, int row) {
 
 		MonteCalc.zeroScore[column][row] = 0;
@@ -254,25 +272,29 @@ public class MonteCarloGuessPlayer implements Player {
 
 	}
 
-	public int[] monteSelect(Ship select, int index) {
+	/**
+	 * 
+	 * @param select ship selection
+	 * @param index
+	 * @return
+	 */
+	public int[] monteSelect(Ship select) {
 		if (select == aircraftCarrier) {
 
-			return ac.targetCalc(index);
+			return ac.targetCalc();
 		} else if (select == battleship) {
-
-			return battle.targetCalc(index);
+			return battle.targetCalc();
 		} else if (select == cruiser) {
 
-			return cruise.targetCalc(index);
+			return cruise.targetCalc();
 		} else if (select == submarine) {
-			return sub.targetCalc(index);
+			return sub.targetCalc();
 		} else {
-			return destroy.targetCalc(index);
+			return destroy.targetCalc();
 		}
 
 	}
 
-	
 	@Override
 	public Guess makeGuess() {
 
@@ -289,7 +311,7 @@ public class MonteCarloGuessPlayer implements Player {
 
 			do {
 
-				int[] gridSelect = monteSelect(selectedShip, index);
+				int[] gridSelect = monteSelect(selectedShip);
 				guess.column = gridSelect[0];
 				guess.row = gridSelect[1];
 
@@ -323,7 +345,6 @@ public class MonteCarloGuessPlayer implements Player {
 
 			this.isGuessed[guess.row][guess.column] = true;
 			MonteCalc.isGuessed[guess.row][guess.column] = true;
-
 
 			return guess;
 		}
