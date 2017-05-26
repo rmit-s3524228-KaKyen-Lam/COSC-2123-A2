@@ -227,7 +227,6 @@ public class MonteCarloGuessPlayer implements Player {
 		} else if (remainingShips.contains(cruiser)) {
 			return cruiser;
 		} else if (remainingShips.contains(submarine)) {
-			sub.getScore();
 			return submarine;
 		} else {
 			return destroyer;
